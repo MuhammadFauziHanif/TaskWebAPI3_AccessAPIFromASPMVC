@@ -57,21 +57,43 @@ namespace MyRESTServices.Data
 
         public async Task<int> GetCountCategories(string name)
         {
-            var count = await _context.Categories
-                .Where(c => c.CategoryName.Contains(name))
-                .CountAsync();
-            return count;
+            int count;
+            if (name == "")
+            {
+                count = await _context.Categories.CountAsync();
+                return count;
+            }
+            else
+            {
+                count = await _context.Categories
+                                       .Where(c => c.CategoryName.Contains(name))
+                                                          .CountAsync();
+                return count;
+            }
         }
 
         public async Task<IEnumerable<Category>> GetWithPaging(int pageNumber, int pageSize, string name)
         {
-            var categories = await _context.Categories
-                .Where(c => c.CategoryName.Contains(name))
-                .OrderBy(c => c.CategoryName)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-            return categories;
+            IEnumerable<Category> categories;
+            if (name == "")
+            {
+                categories = await _context.Categories
+                    .OrderBy(c => c.CategoryName)
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+                return categories;
+            }
+            else
+            {
+                categories = await _context.Categories
+                    .Where(c => c.CategoryName.Contains(name))
+                    .OrderBy(c => c.CategoryName)
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+                return categories;
+            }
         }
 
         public async Task<Category> Insert(Category entity)

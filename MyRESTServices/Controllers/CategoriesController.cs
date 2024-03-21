@@ -97,5 +97,19 @@ namespace MyRESTServices.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("GetWithPaging")]
+        public async Task<IEnumerable<CategoryDTO>> GetWithPaging(int pageNumber, int pageSize, string name = "")
+        {
+            var results = await _categoryBLL.GetWithPaging(pageNumber, pageSize, name);
+            return results;
+        }
+
+        [HttpGet("GetCountCategories")]
+        public async Task<int> GetCountCategories(string name = "")
+        {
+            var results = await _categoryBLL.GetCountCategories(name);
+            return results;
+        }
     }
 }

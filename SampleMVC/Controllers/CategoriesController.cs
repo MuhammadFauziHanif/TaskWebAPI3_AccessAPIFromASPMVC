@@ -7,7 +7,7 @@ using SampleMVC.ViewModels;
 namespace SampleMVC.Controllers;
 
 
-[Authorize(Roles = "admin,contributor")]
+//[Authorize(Roles = "admin,contributor")]
 public class CategoriesController : Controller
 {
     private readonly ICategoryServices _categoryServices;
@@ -21,7 +21,7 @@ public class CategoriesController : Controller
     }
 
 
-    public IActionResult Index(int pageNumber = 1, int pageSize = 5, string search = "", string act = "")
+    public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5, string search = "", string act = "")
     {
 
         /*if (HttpContext.Session.GetString("user") == null)
@@ -47,11 +47,11 @@ public class CategoriesController : Controller
 
         CategoriesViewModel categoriesViewModel = new CategoriesViewModel()
         {
-            Categories = _categoryBLL.GetWithPaging(pageNumber, pageSize, search)
+            Categories = await _categoryServices.GetWithPaging(pageNumber, pageSize, search)
         };
 
         //var models = _categoryBLL.GetWithPaging(pageNumber, pageSize, search);
-        var maxsize = _categoryBLL.GetCountCategories(search);
+        var maxsize = await _categoryServices.GetCountCategories(search);
         //return Content($"{pageNumber} - {pageSize} - {search} - {act}");
 
         if (act == "next")
@@ -119,7 +119,7 @@ public class CategoriesController : Controller
         return View(model);
     }
 
-    [Authorize]
+    //[Authorize]
     public IActionResult Create()
     {
 
@@ -143,7 +143,7 @@ public class CategoriesController : Controller
         return PartialView("_CreateCategoryPartial");
     }
 
-    [Authorize]
+    //[Authorize]
     [HttpPost]
     public IActionResult Create(SampleMVC.ViewModels.CategoriesViewModel categoriesViewModel)
     {
@@ -174,8 +174,8 @@ public class CategoriesController : Controller
         return RedirectToAction("Index");
     }
 
-    [Authorize]
-    public IActionResult Edit(int id)
+    //[Authorize]
+    public async Task<IActionResult> Edit(int id)
     {
         /*if (HttpContext.Session.GetString("user") == null)
         {
@@ -191,7 +191,7 @@ public class CategoriesController : Controller
             return RedirectToAction("Index", "Home");
         }*/
 
-        var model = _categoryServices.GetById(id);
+        var model = await _categoryServices.GetById(id);
         if (model == null)
         {
             TempData["message"] = @"<div class='alert alert-danger'><strong>Error!</strong>Category Not Found !</div>";
@@ -200,13 +200,13 @@ public class CategoriesController : Controller
         return View(model);
     }
 
-    [Authorize]
+    //[Authorize]
     [HttpPost]
-    public IActionResult Edit(int id, CategoryUpdateDTO categoryEdit)
+    public async Task<IActionResult> Edit(int id, CategoryUpdateDTO categoryEdit)
     {
         try
         {
-            _categoryServices.Update(id, categoryEdit);
+            await _categoryServices.Update(id, categoryEdit);
             TempData["message"] = @"<div class='alert alert-success'><strong>Success!</strong>Edit Data Category Success !</div>";
         }
         catch (Exception ex)
@@ -218,8 +218,8 @@ public class CategoriesController : Controller
     }
 
 
-    [Authorize]
-    public IActionResult Delete(int id)
+    //[Authorize]
+    public async Task<IActionResult> Delete(int id)
     {
         /*if (HttpContext.Session.GetString("user") == null)
         {
@@ -235,7 +235,7 @@ public class CategoriesController : Controller
             return RedirectToAction("Login", "Users");
         }*/
 
-        var model = _categoryServices.GetById(id);
+        var model = await _categoryServices.GetById(id);
         if (model == null)
         {
             TempData["message"] = @"<div class='alert alert-danger'><strong>Error!</strong>Category Not Found !</div>";
@@ -244,13 +244,13 @@ public class CategoriesController : Controller
         return View(model);
     }
 
-    [Authorize]
+    //[Authorize]
     [HttpPost]
-    public IActionResult Delete(int id, CategoryDTO category)
+    public async Task<IActionResult> Delete(int id, CategoryDTO category)
     {
         try
         {
-            _categoryServices.Delete(id);
+            await _categoryServices.Delete(id);
             TempData["message"] = @"<div class='alert alert-success'><strong>Success!</strong>Delete Data Category Success !</div>";
         }
         catch (Exception ex)
@@ -261,20 +261,20 @@ public class CategoriesController : Controller
         return RedirectToAction("Index");
     }
 
-    public IActionResult DisplayDropdownList()
+    public async Task<IActionResult> DisplayDropdownList()
     {
-        var categories = _categoryServices.GetAll();
+        var categories = await _categoryServices.GetAll();
         ViewBag.Categories = categories;
         return View();
     }
 
     [HttpPost]
-    public IActionResult DisplayDropdownList(string CategoryID)
+    public async Task<IActionResult> DisplayDropdownList(string CategoryID)
     {
         ViewBag.CategoryID = CategoryID;
         ViewBag.Message = $"You selected {CategoryID}";
 
-        ViewBag.Categories = _categoryServices.GetAll();
+        ViewBag.Categories = await _categoryServices.GetAll();
 
         return View();
     }
